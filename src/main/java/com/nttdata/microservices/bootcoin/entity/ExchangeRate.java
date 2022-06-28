@@ -12,6 +12,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @NoArgsConstructor
 @Document(collection = "exchange-rate")
 public class ExchangeRate extends AbstractAuditingEntity {
+
   @Id
   private String id;
   private Double purchase;

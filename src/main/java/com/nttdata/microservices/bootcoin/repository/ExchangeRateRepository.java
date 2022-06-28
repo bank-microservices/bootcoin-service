@@ -8,5 +8,5 @@ import reactor.core.publisher.Mono;
 @Repository
 public interface ExchangeRateRepository extends ReactiveMongoRepository<ExchangeRate, String> {
 
-  Mono<ExchangeRate> findTopByOrOrderByRegisterDateDesc();
+  Mono<ExchangeRate> findTopByOrderByRegisterDateDesc();
 }

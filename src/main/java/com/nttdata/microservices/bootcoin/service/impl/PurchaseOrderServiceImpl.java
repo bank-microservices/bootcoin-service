@@ -206,7 +206,7 @@ public class PurchaseOrderServiceImpl implements PurchaseOrderService {
   }
 
   private Mono<PurchaseOrderDto> getExchangeRate(PurchaseOrderDto purchaseOrderDto) {
-    return exchangeRateRepository.findTopByOrOrderByRegisterDateDesc()
+    return exchangeRateRepository.findTopByOrderByRegisterDateDesc()
         .doOnNext(purchaseOrderDto::setExchangeRate)
         .thenReturn(purchaseOrderDto);
   }

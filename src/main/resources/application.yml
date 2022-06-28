@@ -1,0 +1,50 @@
+application:
+  config:
+    description: Profile Default
+
+server:
+  port: ${PORT:8087}
+
+spring:
+  application:
+    name: bootcoin-service
+  data:
+    mongodb:
+      uri: ${MONGODB_CONNSTRING:mongodb://localhost:27017/bootcoindb}
+  #      username: ${MONGO_USERNAME:admin}
+#      password: ${MONGO_PASSWORD:s3cret}
+  messages:
+    basename: i18n/messages
+    fallback-to-system-locale: true
+    use-code-as-default-message: true
+  jackson:
+    default-property-inclusion: NON_NULL
+  redis:
+    port: 6379
+    host: 192.168.1.20
+    password: eYVX7EwVmmxKPCDmwMtyKVge8oLd2t81
+  kafka:
+    template:
+      default-topic: bootcoin-events
+    admin:
+      properties:
+        bootstrap.servers: 192.168.1.20:29093
+    consumer:
+      bootstrap-servers: 192.168.1.20:29093
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      group-id: bootcoin-group
+    producer:
+      bootstrap-servers: 192.168.1.20:29093
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+      properties:
+        retries: 10
+        retry.backoff.ms: 1000
+
+kafka:
+  topic:
+    wallet-request: TOPIC-Wallet-Request
+    wallet-response: TOPIC-Wallet-Response
+cache:
+  enabled: true

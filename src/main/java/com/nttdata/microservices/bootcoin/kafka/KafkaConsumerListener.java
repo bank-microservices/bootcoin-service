@@ -1,6 +1,5 @@
 package com.nttdata.microservices.bootcoin.kafka;
 
-import com.nttdata.microservices.bootcoin.service.WalletKafkaService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
@@ -12,12 +11,10 @@ import org.springframework.stereotype.Component;
 @Component
 public class KafkaConsumerListener {
 
-  private final WalletKafkaService walletService;
-
   @KafkaListener(topics = "#{'${kafka.topic.wallet-request}'}")
   public void OnMessage(ConsumerRecord<String, String> rc) {
     log.info("Consumer record: {}", rc);
-    walletService.findByDocumentNumberForKafka(rc.value()).subscribe();
+//    walletService.findByDocumentNumberForKafka(rc.value()).subscribe();
   }
 
 }

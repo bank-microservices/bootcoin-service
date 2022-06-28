@@ -17,7 +17,7 @@ import org.springframework.util.concurrent.ListenableFutureCallback;
 
 @Slf4j
 @Component
-public class KafkaProducerService<K,V> {
+public class KafkaProducerService<K, V> {
 
   private final KafkaTemplate<K, V> template;
 
@@ -26,28 +26,42 @@ public class KafkaProducerService<K,V> {
     this.template = template;
   }
 
-  public void send(String topic, V message, K key){
+  public void send(String topic, V message, K key) {
     ListenableFuture<SendResult<K, V>> res = template.send(topic, key, message);
     res.addCallback(messageCallBacks());
   }
 
-  public void send(String topic, V message, K key, Map<String, String> headerList){
+  public ListenableFuture<SendResult<K, V>> send(String topic, V message, K key,
+                                                 ListenableFutureCallback<SendResult<K, V>> callback) {
+    ListenableFuture<SendResult<K, V>> send = template.send(topic, key, message);
+    send.addCallback(callback);
+    return send;
+  }
+
+  public void send(String topic, V message, K key, Map<String, String> headerList) {
     List<Header> messageHeaders = headerList.keySet()
         .stream()
         .map(k -> new RecordHeader(k, headerList.get(k).getBytes()))
         .collect(Collectors.toList());
-    ProducerRecord<K,V> record = new ProducerRecord<>(topic, null, key, message, messageHeaders);
+    ProducerRecord<K, V> record = new ProducerRecord<>(topic, null, key, message, messageHeaders);
     ListenableFuture<SendResult<K, V>> res = template.send(record);
     res.addCallback(messageCallBacks());
   }
 
-  public ListenableFuture<SendResult<K, V>> send(String topic, V message){
+  public ListenableFuture<SendResult<K, V>> send(String topic, V message,
+                                                 ListenableFutureCallback<SendResult<K, V>> callback) {
+    ListenableFuture<SendResult<K, V>> res = template.send(topic, message);
+    res.addCallback(callback);
+    return res;
+  }
+
+  public ListenableFuture<SendResult<K, V>> send(String topic, V message) {
     ListenableFuture<SendResult<K, V>> res = template.send(topic, message);
     res.addCallback(messageCallBacks());
     return res;
   }
 
-  private ListenableFutureCallback<SendResult<K, V>> messageCallBacks(){
+  private ListenableFutureCallback<SendResult<K, V>> messageCallBacks() {
     return new ListenableFutureCallback<>() {
       @SneakyThrows
       @Override

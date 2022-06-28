@@ -78,7 +78,7 @@ public class WalletServiceImpl implements WalletService {
     log.debug("find Wallet by documentNumber: {}", walletDto.getDocumentNumber());
 
     return findByDocumentNumber(walletDto.getDocumentNumber())
-        .flatMap(r -> Mono.error(new BadRequestException(getMsg("debit.card.already",
+        .flatMap(r -> Mono.error(new BadRequestException(getMsg("wallet.already",
             walletDto.getDocumentNumber()))))
         .thenReturn(walletDto);
   }

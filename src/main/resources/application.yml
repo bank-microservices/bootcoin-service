@@ -12,7 +12,7 @@ spring:
     mongodb:
       uri: ${MONGODB_CONNSTRING:mongodb://localhost:27017/bootcoindb}
   #      username: ${MONGO_USERNAME:admin}
-#      password: ${MONGO_PASSWORD:s3cret}
+  #      password: ${MONGO_PASSWORD:s3cret}
   messages:
     basename: i18n/messages
     fallback-to-system-locale: true
@@ -24,27 +24,21 @@ spring:
     host: 192.168.1.20
     password: eYVX7EwVmmxKPCDmwMtyKVge8oLd2t81
   kafka:
-    template:
-      default-topic: bootcoin-events
-    admin:
-      properties:
-        bootstrap.servers: 192.168.1.20:29093
     consumer:
-      bootstrap-servers: 192.168.1.20:29093
-      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
-      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
       group-id: bootcoin-group
     producer:
-      bootstrap-servers: 192.168.1.20:29093
-      key-serializer: org.apache.kafka.common.serialization.StringSerializer
-      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
       properties:
         retries: 10
         retry.backoff.ms: 1000
+    bootstrap-servers: 192.168.1.20:29093
 
 kafka:
   topic:
-    wallet-request: TOPIC-Wallet-Request
-    wallet-response: TOPIC-Wallet-Response
+    account-request: TOPIC-account-request
+    account-response: TOPIC-account-response
+    yanki-request: TOPIC-yanki-request
+    wallet-request: TOPIC-wallet-request
+    wallet-response: TOPIC-wallet-response
+
 cache:
   enabled: true

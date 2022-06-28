@@ -13,11 +13,11 @@ import reactor.core.publisher.Mono;
 
 @RequiredArgsConstructor
 @Service
-//@ConditionalOnProperty(name = "cache.enabled", havingValue = "false", matchIfMissing = true)
+@ConditionalOnProperty(name = "cache.enabled", havingValue = "false", matchIfMissing = true)
 public class ExchangeRateServiceImpl implements ExchangeRateService {
 
   private final ExchangeRateRepository exchangeRateRepository;
-  private final ExchangeRateMapper exchangeRateMapper;
+  protected final ExchangeRateMapper exchangeRateMapper;
 
   @Override
   public Flux<ExchangeRateDto> findAll() {
@@ -43,13 +43,4 @@ public class ExchangeRateServiceImpl implements ExchangeRateService {
         .map(exchangeRateMapper::toDto);
   }
 
-  @Override
-  public Mono<ExchangeRateDto> update(String id, ExchangeRateDto walletDto) {
-    return null;
-  }
-
-  @Override
-  public Mono<Void> delete(String id) {
-    return null;
-  }
 }

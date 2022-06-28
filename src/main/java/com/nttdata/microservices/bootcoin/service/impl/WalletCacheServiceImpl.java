@@ -1,14 +1,9 @@
 package com.nttdata.microservices.bootcoin.service.impl;
 
-import com.nttdata.microservices.bootcoin.entity.Wallet;
-import com.nttdata.microservices.bootcoin.kafka.KafkaProducerService;
 import com.nttdata.microservices.bootcoin.repository.WalletRepository;
-import com.nttdata.microservices.bootcoin.service.WalletKafkaService;
 import com.nttdata.microservices.bootcoin.service.dto.WalletDto;
 import com.nttdata.microservices.bootcoin.service.mapper.WalletMapper;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.data.redis.core.ReactiveHashOperations;
 import org.springframework.stereotype.Service;
@@ -18,34 +13,28 @@ import reactor.core.publisher.Mono;
 @Slf4j
 @Service
 @ConditionalOnProperty(name = "cache.enabled", havingValue = "true")
-public class WalletCacheServiceImpl extends WalletServiceImpl implements WalletKafkaService {
+public class WalletCacheServiceImpl extends WalletServiceImpl{
 
   private final ReactiveHashOperations<String, String, WalletDto> redisOperations;
-  private final KafkaProducerService<?, Wallet> kafkaProducerService;
 
   private static final String KEY_CACHE = "wallets";
 
-  @Value("${kafka.topic.wallet-response}")
-  private String topic;
-
   public WalletCacheServiceImpl(WalletRepository walletRepository, WalletMapper walletMapper,
-                                ReactiveHashOperations<String, String, WalletDto> redisOperations,
-                                KafkaProducerService<?, Wallet> kafkaProducerService) {
+                                ReactiveHashOperations<String, String, WalletDto> redisOperations) {
     super(walletRepository, walletMapper);
     this.redisOperations = redisOperations;
-    this.kafkaProducerService = kafkaProducerService;
   }
 
   @Override
   public Flux<WalletDto> findAll() {
     return redisOperations.values(KEY_CACHE)
-        .switchIfEmpty(getAllDatabase());
+        .switchIfEmpty(getAllFromDatabase());
   }
 
   @Override
   public Mono<WalletDto> findById(String id) {
     return redisOperations.get(KEY_CACHE, id)
-        .switchIfEmpty(this.getFromDatabaseAndCache(id));
+        .switchIfEmpty(this.getFromDatabase(id));
   }
 
   @Override
@@ -56,17 +45,17 @@ public class WalletCacheServiceImpl extends WalletServiceImpl implements WalletK
         .switchIfEmpty(super.findByDocumentNumber(documentNumber));
   }
 
-  @Override
-  public Mono<Void> findByDocumentNumberForKafka(String documentNumber) {
-    log.debug("kafka client find by documentNumber: {}", documentNumber);
-    return this.findByDocumentNumber(documentNumber)
-        .map(walletMapper::toEntity)
-        .doOnNext(dto -> {
-          log.debug("kafka client find result: {}", dto);
-          kafkaProducerService.send(topic, dto);
-        })
-        .then();
-  }
+//  @Override
+//  public Mono<Void> findByDocumentNumberForKafka(String documentNumber) {
+//    log.debug("kafka client find by documentNumber: {}", documentNumber);
+//    return this.findByDocumentNumber(documentNumber)
+//        .map(walletMapper::toEntity)
+//        .doOnNext(dto -> {
+//          log.debug("kafka client find result: {}", dto);
+//          kafkaProducerService.send(topic, dto);
+//        })
+//        .then();
+//  }
 
   @Override
   public Mono<WalletDto> create(WalletDto wallet) {
@@ -89,13 +78,13 @@ public class WalletCacheServiceImpl extends WalletServiceImpl implements WalletK
         .thenReturn(walletDto);
   }
 
-  private Mono<WalletDto> getFromDatabaseAndCache(String id) {
+  private Mono<WalletDto> getFromDatabase(String id) {
     return super.findById(id)
         .flatMap(dto -> this.redisOperations.put(KEY_CACHE, id, dto)
             .thenReturn(dto));
   }
 
-  private Flux<WalletDto> getAllDatabase() {
+  private Flux<WalletDto> getAllFromDatabase() {
     return super.findAll()
         .flatMap(dto -> this.redisOperations.put(KEY_CACHE, dto.getId(), dto)
             .thenReturn(dto));

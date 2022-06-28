@@ -44,10 +44,4 @@ public class ExchangeRateController {
     return ResponseUtil.wrapOrNotFound(exchangeRateService.create(exchangeRateDto));
   }
 
-  @DeleteMapping("/{id}")
-  @ResponseStatus(HttpStatus.OK)
-  private Mono<ResponseEntity<Void>> delete(@PathVariable("id") String id) {
-    return ResponseUtil.wrapOrNotFound(exchangeRateService.delete(id));
-  }
-
 }

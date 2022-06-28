@@ -12,7 +12,4 @@ public interface ExchangeRateService {
 
   Mono<ExchangeRateDto> create(ExchangeRateDto wallet);
 
-  Mono<ExchangeRateDto> update(String id, ExchangeRateDto walletDto);
-
-  Mono<Void> delete(String id);
 }

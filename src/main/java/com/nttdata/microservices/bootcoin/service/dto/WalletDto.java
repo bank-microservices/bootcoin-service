@@ -1,9 +1,8 @@
 package com.nttdata.microservices.bootcoin.service.dto;
 
-import static com.fasterxml.jackson.annotation.JsonProperty.Access.READ_ONLY;
-
-import com.fasterxml.jackson.annotation.JsonProperty;
-import javax.validation.constraints.Digits;
+import com.nttdata.microservices.bootcoin.entity.DocumentType;
+import com.nttdata.microservices.bootcoin.entity.PaymentMethod;
+import com.nttdata.microservices.bootcoin.util.validation.ValueOfEnum;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
@@ -24,6 +23,10 @@ public class WalletDto {
   @NotBlank(message = "documentNumber is required")
   @Pattern(regexp = "\\d+$", message = "documentNumber is not valid")
   private String documentNumber;
+
+  @NotNull(message = "documentType is required")
+  @ValueOfEnum(enumClass = DocumentType.class, message = "documentType is invalid value")
+  private String documentType;
 
   @NotBlank(message = "fullName is required")
   private String fullName;

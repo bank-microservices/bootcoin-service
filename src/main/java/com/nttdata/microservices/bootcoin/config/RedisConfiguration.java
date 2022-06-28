@@ -1,6 +1,7 @@
 package com.nttdata.microservices.bootcoin.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.nttdata.microservices.bootcoin.service.dto.ExchangeRateDto;
 import com.nttdata.microservices.bootcoin.service.dto.WalletDto;
 import java.time.Duration;
 import org.springframework.beans.factory.annotation.Value;
@@ -52,13 +53,13 @@ public class RedisConfiguration {
 
 
   @Bean
-  public ReactiveHashOperations<String, String, WalletDto> hashOperations(
+  public ReactiveHashOperations<String, String, WalletDto> hashOperationsWallet(
       ReactiveRedisConnectionFactory redisConnectionFactory) {
     var template = new ReactiveRedisTemplate<>(
         redisConnectionFactory,
         RedisSerializationContext.<String, WalletDto>newSerializationContext(
                 new StringRedisSerializer())
-            .hashKey(new GenericToStringSerializer<>(Integer.class))
+            .hashKey(new GenericToStringSerializer<>(String.class))
             .hashValue(new Jackson2JsonRedisSerializer<>(WalletDto.class))
             .build()
     );
@@ -66,15 +67,17 @@ public class RedisConfiguration {
   }
 
   @Bean
-  public ReactiveRedisTemplate<String, WalletDto> reactiveRedisTemplate(
-      ReactiveRedisConnectionFactory factory) {
-    Jackson2JsonRedisSerializer<WalletDto> serializer =
-        new Jackson2JsonRedisSerializer<>(WalletDto.class);
-    RedisSerializationContext.RedisSerializationContextBuilder<String, WalletDto> builder =
-        RedisSerializationContext.newSerializationContext(new StringRedisSerializer());
-    RedisSerializationContext<String, WalletDto> context = builder.value(serializer)
-        .build();
-    return new ReactiveRedisTemplate<>(factory, context);
+  public ReactiveHashOperations<String, String, ExchangeRateDto> hashOperationsExChange(
+      ReactiveRedisConnectionFactory redisConnectionFactory) {
+    var template = new ReactiveRedisTemplate<>(
+        redisConnectionFactory,
+        RedisSerializationContext.<String, ExchangeRateDto>newSerializationContext(
+                new StringRedisSerializer())
+            .hashKey(new GenericToStringSerializer<>(String.class))
+            .hashValue(new Jackson2JsonRedisSerializer<>(ExchangeRateDto.class))
+            .build()
+    );
+    return template.opsForHash();
   }
 
   @Bean
